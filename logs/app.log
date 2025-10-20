@@ -1,0 +1,153 @@
+2025-10-20 14:22:29 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:24:12 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:24:12 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:24:12 - main - INFO - =======================================
+2025-10-20 14:24:12 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:24:12 - main - INFO - =======================================
+2025-10-20 14:24:12 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:24:12 - common.db_connection - INFO - 데이터베이스 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:24:12 - common.db_connection - ERROR - 스키마 파일을 찾을 수 없음: C:\dev\word\schema.sql
+2025-10-20 14:24:12 - common.db_connection - ERROR - 쿼리 실행 실패: SELECT setting_key, setting_value FROM user_settin... - no such table: user_settings
+2025-10-20 14:24:12 - common.settings - ERROR - 설정값 로드 중 오류 발생: no such table: user_settings
+2025-10-20 14:24:12 - common.settings - WARNING - DB에서 설정 로드 실패, config.py의 기본 설정값 사용.
+2025-10-20 14:24:12 - main - CRITICAL - 데이터베이스 초기화 실패: 'SettingsManager' object has no attribute 'load_settings_from_db'
+Traceback (most recent call last):
+  File "C:\dev\word\main.py", line 58, in setup_database
+    settings.load_settings_from_db()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SettingsManager' object has no attribute 'load_settings_from_db'
+2025-10-20 14:32:41 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:32:41 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:32:41 - main - INFO - =======================================
+2025-10-20 14:32:41 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:32:41 - main - INFO - =======================================
+2025-10-20 14:32:41 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:32:41 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:32:41 - common.db_connection - CRITICAL - 스키마 파일이 존재하지 않습니다: C:\dev\word\schema.sql
+2025-10-20 14:32:41 - main - CRITICAL - 데이터베이스 스키마 초기화 실패: 스키마 파일 없음: C:\dev\word\schema.sql
+Traceback (most recent call last):
+  File "C:\dev\word\main.py", line 65, in setup_database
+    db.initialize_database(config.SCHEMA_PATH)
+  File "C:\dev\word\common\db_connection.py", line 152, in initialize_database
+    raise FileNotFoundError(f"스키마 파일 없음: {schema_file}")
+FileNotFoundError: 스키마 파일 없음: C:\dev\word\schema.sql
+2025-10-20 14:33:04 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:33:04 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:33:04 - main - INFO - =======================================
+2025-10-20 14:33:04 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:33:04 - main - INFO - =======================================
+2025-10-20 14:33:04 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:33:04 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:33:04 - common.db_connection - CRITICAL - 스키마 파일이 존재하지 않습니다: C:\dev\word\schema.sql
+2025-10-20 14:33:04 - main - CRITICAL - 데이터베이스 스키마 초기화 실패: 스키마 파일 없음: C:\dev\word\schema.sql
+Traceback (most recent call last):
+  File "C:\dev\word\main.py", line 65, in setup_database
+    db.initialize_database(config.SCHEMA_PATH)
+  File "C:\dev\word\common\db_connection.py", line 152, in initialize_database
+    raise FileNotFoundError(f"스키마 파일 없음: {schema_file}")
+FileNotFoundError: 스키마 파일 없음: C:\dev\word\schema.sql
+2025-10-20 14:34:33 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:34:33 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:34:33 - main - INFO - =======================================
+2025-10-20 14:34:33 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:34:33 - main - INFO - =======================================
+2025-10-20 14:34:33 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:34:33 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:34:33 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-10-20 14:34:33 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:34:33 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-10-20 14:34:33 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-10-20 14:34:33 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-10-20 14:34:33 - main - CRITICAL - FATAL ERROR: 애플리케이션 실행 중 치명적인 오류 발생: BaseModel.__init__() missing 1 required positional argument: 'table_name'
+Traceback (most recent call last):
+  File "C:\dev\word\main.py", line 119, in main
+    word_controller = WordController()
+                      ^^^^^^^^^^^^^^^^
+  File "C:\dev\word\controllers\word_controller.py", line 24, in __init__
+    self.model = WordModel()
+                 ^^^^^^^^^^^
+  File "C:\dev\word\models\word_model.py", line 27, in __init__
+    super().__init__()
+TypeError: BaseModel.__init__() missing 1 required positional argument: 'table_name'
+2025-10-20 14:36:17 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:36:17 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:36:17 - main - INFO - =======================================
+2025-10-20 14:36:17 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:36:17 - main - INFO - =======================================
+2025-10-20 14:36:17 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:36:17 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:36:17 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-10-20 14:36:17 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:36:17 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-10-20 14:36:17 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-10-20 14:36:17 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-10-20 14:36:17 - common.base_model - DEBUG - BaseModel 초기화: 테이블 'words'
+2025-10-20 14:36:17 - models.word_model - DEBUG - WordModel 초기화
+2025-10-20 14:36:17 - controllers.word_controller - DEBUG - WordController 초기화
+2025-10-20 14:36:17 - common.base_model - DEBUG - BaseModel 초기화: 테이블 'words'
+2025-10-20 14:36:17 - main - CRITICAL - FATAL ERROR: 애플리케이션 실행 중 치명적인 오류 발생: MainWindow.__init__() got an unexpected keyword argument 'word_controller'
+Traceback (most recent call last):
+  File "C:\dev\word\main.py", line 123, in main
+    main_window = MainWindow(
+                  ^^^^^^^^^^^
+TypeError: MainWindow.__init__() got an unexpected keyword argument 'word_controller'
+2025-10-20 14:36:49 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:36:49 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:36:49 - main - INFO - =======================================
+2025-10-20 14:36:49 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:36:49 - main - INFO - =======================================
+2025-10-20 14:36:49 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:36:49 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:36:49 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-10-20 14:36:49 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:36:49 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-10-20 14:36:49 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-10-20 14:36:49 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-10-20 14:36:49 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-20 14:36:49 - models.word_model - DEBUG - WordModel 초기화
+2025-10-20 14:36:49 - controllers.word_controller - DEBUG - WordController 초기화
+2025-10-20 14:36:49 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-20 14:36:49 - main - CRITICAL - FATAL ERROR: 애플리케이션 실행 중 치명적인 오류 발생: MainWindow.__init__() got an unexpected keyword argument 'word_controller'
+Traceback (most recent call last):
+  File "C:\dev\word\main.py", line 123, in main
+    main_window = MainWindow(
+                  ^^^^^^^^^^^
+TypeError: MainWindow.__init__() got an unexpected keyword argument 'word_controller'
+2025-10-20 14:38:57 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:38:57 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:38:57 - main - INFO - =======================================
+2025-10-20 14:38:57 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:38:57 - main - INFO - =======================================
+2025-10-20 14:38:57 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:38:57 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:38:57 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-10-20 14:38:57 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:38:57 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-10-20 14:38:57 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-10-20 14:38:57 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-10-20 14:38:57 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-20 14:38:57 - models.word_model - DEBUG - WordModel 초기화
+2025-10-20 14:38:57 - controllers.word_controller - DEBUG - WordController 초기화
+2025-10-20 14:38:57 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-20 14:38:57 - main_window - DEBUG - MainWindow 초기화 시작
+2025-10-20 14:38:58 - main_window - INFO - MainWindow UI 설정 완료
+2025-10-20 14:38:58 - main - INFO - 메인 윈도우 표시 완료. 이벤트 루프 진입.
+2025-10-20 14:46:54 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-20 14:46:54 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-20 14:46:54 - main - INFO - =======================================
+2025-10-20 14:46:54 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-20 14:46:54 - main - INFO - =======================================
+2025-10-20 14:46:54 - main - INFO - 데이터베이스 설정 시작...
+2025-10-20 14:46:54 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:46:54 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-10-20 14:46:54 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-10-20 14:46:54 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-10-20 14:46:54 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-10-20 14:46:54 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-10-20 14:46:54 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-20 14:46:54 - models.word_model - DEBUG - WordModel 초기화
+2025-10-20 14:46:54 - controllers.word_controller - DEBUG - WordController 초기화
+2025-10-20 14:46:54 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-20 14:46:54 - main_window - DEBUG - MainWindow 초기화 시작
+2025-10-20 14:46:54 - main_window - INFO - MainWindow UI 설정 완료
+2025-10-20 14:46:54 - main - INFO - 메인 윈도우 표시 완료. 이벤트 루프 진입.

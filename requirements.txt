@@ -1,0 +1,20 @@
+# GUI 프레임워크
+PyQt5==5.15.9
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.12.1
+
+# 데이터 처리
+pandas==2.0.3
+
+# 차트 및 그래프
+matplotlib==3.7.2
+
+# 패키징
+pyinstaller==5.13.0
+
+# 개발 도구 (선택)
+pylint==2.17.4
+black==23.7.0
+pytest==7.4.0
+pytest-cov==4.1.0
+pytest-qt==4.2.0
