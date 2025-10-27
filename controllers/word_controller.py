@@ -24,10 +24,18 @@ class WordController:
         self.model = WordModel()
         logger.debug("WordController 초기화")
     
-    def create_word(self, english: str, korean: str, memo: str = "") -> Dict[str, Any]:
+    def create_word(self, english: str, korean: str, memo: str = "", is_favorite: int = 0) -> Dict[str, Any]:
         """
         새 단어를 추가한다.
-        ... (생략)
+        
+        Args:
+            english: 영어 단어
+            korean: 한국어 뜻
+            memo: 메모 (선택)
+            is_favorite: 즐겨찾기 여부 (0 또는 1)
+        
+        Returns:
+            dict: {'success': bool, 'message': str, 'word_id': int}
         """
         try:
             # 1. 유효성 검사
@@ -36,8 +44,9 @@ class WordController:
                 return {'success': False, 'message': validation['message'], 'word_id': -1}
 
             # 2. 모델에 추가
-            word_id = self.model.add_word(english, korean, memo)
-            logger.info(f"단어 추가 성공: {english} (ID: {word_id})")
+            # 2. 모델에 추가 (is_favorite 전달)
+            word_id = self.model.add_word(english, korean, memo, is_favorite)
+            logger.info(f"단어 추가 성공: {english} (ID: {word_id}, 즐겨찾기: {is_favorite})")
             return {'success': True, 'message': '단어 추가 완료.', 'word_id': word_id}
         except ValueError as e:
             logger.warning(f"단어 추가 실패 (유효성): {e}")

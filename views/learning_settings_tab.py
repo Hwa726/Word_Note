@@ -1,4 +1,4 @@
-# 2025-10-21 - 스마트 단어장 - 학습 설정 뷰
+# 2025-10-27 - 스마트 단어장 - 학습 설정 뷰 (수정본)
 # 파일 위치: views/learning_settings_tab.py
 
 from PyQt5.QtWidgets import (
@@ -20,15 +20,15 @@ class LearningSettingsTab(QWidget):
     설정이 완료되면 start_learning_signal을 통해 MainWindow에 학습 시작을 알립니다.
     """
     
-    # MainWindow에서 뷰 전환을 트리거하는 시그널 (단어 수와 모드를 인자로 전달)
-    start_learning_signal = pyqtSignal(int, str) 
+    # MainWindow에서 뷰 전환을 트리거하는 시그널 (모드만 전달)
+    start_learning_signal = pyqtSignal(str) 
 
     def __init__(self, controller: LearningController):
         super().__init__()
         self.controller = controller
         self.settings = get_settings_manager()
         
-        self.total_words_count = 0 # 전체 단어 수
+        self.total_words_count = 0
         
         self._setup_ui()
         self._load_initial_data()
@@ -80,9 +80,12 @@ class LearningSettingsTab(QWidget):
         goal_layout.addWidget(QLabel("오늘의 학습 목표 단어 수:"))
         
         self.goal_spinbox = QSpinBox()
-        self.goal_spinbox.setRange(1, 500) # 최소 1, 최대 500개
-        self.goal_spinbox.setValue(self.settings.get_setting('daily_word_goal', int))
+        self.goal_spinbox.setRange(1, 500)
+        # ✅ 수정: get_setting 호출 시 타입 힌트 제거 (default만 사용)
+        self.goal_spinbox.setValue(self.settings.get_setting('daily_word_goal', 50))
         self.goal_spinbox.setSuffix("개")
+        # ✅ 추가: 값이 변경될 때마다 DB에 저장
+        self.goal_spinbox.valueChanged.connect(self._on_goal_changed)
         goal_layout.addWidget(self.goal_spinbox)
         goal_layout.addStretch()
         layout.addLayout(goal_layout)
@@ -96,8 +99,8 @@ class LearningSettingsTab(QWidget):
         self.mode_combobox.addItem("한국어 -> 영어 (KR_TO_EN)", 'KR_TO_EN')
         self.mode_combobox.addItem("양방향 혼합 (MIXED)", 'MIXED')
         
-        # config에 저장된 값이 있다면 로드 (없다면 EN_TO_KR이 기본값)
-        current_mode = self.settings.get_setting('learning_mode', str, default='EN_TO_KR')
+        # 저장된 모드 로드
+        current_mode = self.settings.get_setting('learning_mode', 'EN_TO_KR')
         index = self.mode_combobox.findData(current_mode)
         if index != -1:
             self.mode_combobox.setCurrentIndex(index)
@@ -108,20 +111,25 @@ class LearningSettingsTab(QWidget):
 
         return group
 
+    def _on_goal_changed(self, value: int):
+        """목표 단어 수가 변경될 때 DB에 저장"""
+        self.settings.set_setting('daily_word_goal', value)
+        _logger.debug(f"목표 단어 수 변경: {value}개")
+
     def _load_initial_data(self):
         """초기 단어 수와 복습 단어 수를 로드하여 UI에 표시합니다."""
-        # 💡 이 부분은 WordController와 LearningController의 기능을 사용합니다.
         try:
-            # WordController의 기능이 구현되어 있다면 사용
-            # self.total_words_count = self.controller.get_total_words_count() 
-            # self.review_words_count = self.controller.get_review_words_count()
+            # TODO: WordModel을 통해 실제 단어 수 가져오기
+            # from models.word_model import WordModel
+            # word_model = WordModel()
+            # self.total_words_count = word_model.get_word_count()
             
-            # TODO: 현재 WordController에 해당 기능이 없으므로 임시 값 사용
-            self.total_words_count = 100 
-            self.review_words_count = 15
+            # 임시로 0으로 설정
+            self.total_words_count = 0
+            self.review_words_count = 0
             
             self.total_words_label.setText(f"총 등록 단어: {self.total_words_count}개")
-            self.review_words_label.setText(f"오늘 복습할 단어: {self.review_words_count}개 (SM-2)")
+            self.review_words_label.setText(f"오늘 복습할 단어: {self.review_words_count}개")
 
         except Exception as e:
             _logger.error(f"초기 데이터 로드 실패: {e}")
@@ -133,30 +141,39 @@ class LearningSettingsTab(QWidget):
         selected_mode = self.mode_combobox.currentData()
         
         if self.total_words_count == 0:
-            QMessageBox.warning(self, "경고", "단어장에 등록된 단어가 없습니다. 단어 관리 탭에서 단어를 추가해주세요.")
+            QMessageBox.warning(
+                self, 
+                "경고", 
+                "단어장에 등록된 단어가 없습니다.\n단어 관리 탭에서 단어를 추가해주세요."
+            )
             return
 
-        # 1. LearningController에 세션 시작 요청
-        # 💡 LearningController의 start_learning_session은 학습에 필요한 단어 목록을 로드해야 합니다.
+        # ✅ 수정: Controller에 mode만 전달, 반환값은 bool
         try:
-            session_words = self.controller.start_learning_session(
-                goal_count=selected_goal, 
-                mode=selected_mode
-            )
-            
-            if not session_words:
-                QMessageBox.information(self, "정보", "학습할 단어를 찾지 못했습니다. 설정된 목표를 줄이거나 단어 목록을 확인하세요.")
-                return
-            
-            # 2. 설정값을 DB에 저장 (옵션)
-            self.settings.set_setting('daily_word_goal', str(selected_goal))
+            # 목표 단어 수를 DB에 저장 (Controller가 읽어감)
+            self.settings.set_setting('daily_word_goal', selected_goal)
             self.settings.set_setting('learning_mode', selected_mode)
             
-            _logger.info(f"학습 세션 시작: 목표={selected_goal}, 모드={selected_mode}, 실제 단어 수={len(session_words)}")
+            # Controller에 세션 시작 요청 (mode만 전달)
+            success = self.controller.start_learning_session(mode=selected_mode)
             
-            # 3. MainWindow에 뷰 전환 요청 시그널 전송 (실제 단어 수와 모드 전달)
-            self.start_learning_signal.emit(len(session_words), selected_mode)
+            if not success:
+                QMessageBox.information(
+                    self, 
+                    "정보", 
+                    "학습할 단어를 찾지 못했습니다.\n설정된 목표를 줄이거나 단어 목록을 확인하세요."
+                )
+                return
+            
+            _logger.info(f"학습 세션 시작 성공: 목표={selected_goal}, 모드={selected_mode}")
+            
+            # ✅ 수정: MainWindow에 모드만 전달
+            self.start_learning_signal.emit(selected_mode)
 
         except Exception as e:
             _logger.critical(f"학습 세션 시작 중 치명적인 오류 발생: {e}", exc_info=True)
-            QMessageBox.critical(self, "오류", f"학습 시작 중 오류가 발생했습니다. 로그를 확인해주세요:\n{e}")
+            QMessageBox.critical(
+                self, 
+                "오류", 
+                f"학습 시작 중 오류가 발생했습니다.\n로그를 확인해주세요:\n{e}"
+            )

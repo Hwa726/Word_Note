@@ -1,15 +1,12 @@
-# 2025-10-21 - 스마트 단어장 - 학습 컨트롤러
+# 2025-10-27 - 스마트 단어장 - 학습 컨트롤러 (수정본)
 # 파일 위치: controllers/learning_controller.py
 
 import random
 from typing import List, Dict, Any, Optional
-# 1. Logger 클래스 대신 get_logger 함수 임포트
 from common.logger import get_logger 
 from models.learning_model import LearningModel 
-# 학습 목표값을 가져오기 위해 settings 임포트 (추가)
 from common.settings import get_settings_manager
 
-# 1. _logger 초기화 방식 변경
 _logger = get_logger('learning_controller')
 
 class LearningController:
@@ -26,14 +23,12 @@ class LearningController:
     def __init__(self):
         # Model 인스턴스화
         self.model = LearningModel() 
-        self.settings = get_settings_manager() # 설정 매니저 인스턴스
+        self.settings = get_settings_manager()
         self.current_session_words: List[Dict[str, Any]] = []
         self.current_word_index: int = -1
         self.session_length: int = 0
         self.session_started: bool = False
-        self.learning_mode: str = 'EN_TO_KR' # 기본값
-        
-        # self.session_goal은 settings에서 관리하므로 __init__에서 초기화 필요 없음.
+        self.learning_mode: str = 'EN_TO_KR'
 
     def start_learning_session(self, mode: str = 'EN_TO_KR') -> bool:
         """
@@ -41,6 +36,9 @@ class LearningController:
         
         Args:
             mode: 학습 모드 ('EN_TO_KR' 또는 'KR_TO_EN')
+            
+        Returns:
+            bool: 세션 시작 성공 여부
         """
         if self.session_started:
             _logger.warning("진행 중인 학습 세션이 있습니다. 먼저 종료해야 합니다.")
@@ -48,22 +46,21 @@ class LearningController:
 
         self.learning_mode = mode
         
-        # Model에서 목표 단어 수(goal)를 settings를 통해 내부적으로 처리하므로, 
-        # goal 파라미터를 제거하고 Model의 get_learning_words()를 호출합니다.
-        words = self.model.get_learning_words() # 2. limit 파라미터 제거
+        # ✅ 수정: settings에서 목표 단어 수를 가져와 Model에 전달
+        goal = self.settings.get_setting('daily_word_goal', 50)
+        words = self.model.get_learning_words(limit=goal, learning_mode=mode)
         
         if not words:
             _logger.info("학습할 단어가 없습니다. 단어장을 추가하거나 복습일을 기다리세요.")
             self.session_started = False
             return False
             
-        # 2. 세션 상태 초기화
+        # 세션 상태 초기화
         self.current_session_words = words
         self.session_length = len(words)
         self.current_word_index = 0
         self.session_started = True
 
-        goal = self.settings.get_setting('daily_word_goal', 50) # 로그 출력용
         _logger.info(f"학습 세션 시작: 목표 {goal}개, 실제 {self.session_length}개 단어, 모드: {mode}")
         return True
 
@@ -114,10 +111,10 @@ class LearningController:
         
         word_id = current_word['word_id']
         
-        # 1. Model에 결과 반영 (SM-2 알고리즘 실행 및 DB 업데이트)
+        # Model에 결과 반영 (SM-2 알고리즘 실행 및 DB 업데이트)
         success = self.model.update_word_after_learning(word_id, quality)
 
-        # 2. 다음 단어로 인덱스 이동
+        # 다음 단어로 인덱스 이동
         self.current_word_index += 1
         
         if self.is_session_finished():

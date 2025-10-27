@@ -1,17 +1,14 @@
-# 2025-10-20 - 스마트 단어장 - 학습 모델 (SM-2 알고리즘 기반)
+# 2025-10-27 - 스마트 단어장 - 학습 모델 (SM-2 알고리즘 기반) - 수정본
 # 파일 위치: models/learning_model.py
 
 import datetime
 from typing import List, Dict, Any, Optional
 
-# 경로 수정: database/db_connection -> common/db_connection
 from common.db_connection import get_db_connection 
-# 경로 수정: models/base_model -> common/base_model
 from common.base_model import BaseModel
-# 로깅 클래스 대신 함수 임포트
 from common.logger import get_logger 
 
-# 학습 관련 상수 정의 (config.py에 정의되어 있을 것으로 가정하나, 모델 내에서 기본값 정의)
+# 학습 관련 상수 정의
 SM2_INITIAL_EASE_FACTOR = 2.5
 SM2_MIN_EASE_FACTOR = 1.3
 DEFAULT_DAILY_GOAL = 50
@@ -25,11 +22,10 @@ class LearningModel(BaseModel):
     - 학습 결과에 따른 통계 및 SM-2 파라미터(Ease Factor, Interval) 업데이트
     """
     
-    TABLE_NAME = "words"  # 단어 자체는 words 테이블에 있지만, 학습은 통계 테이블과 연동
+    TABLE_NAME = "words"
 
     def __init__(self):
         super().__init__(self.TABLE_NAME)
-        # self.db는 BaseModel에서 이미 get_db_connection()으로 초기화됨
         
     def _calculate_sm2_params(self, old_ef: float, interval: int, quality: int) -> tuple[float, int]:
         """SM-2 알고리즘 파라미터를 계산합니다."""
@@ -69,39 +65,61 @@ class LearningModel(BaseModel):
             is_correct = 1 if quality >= 3 else 0
             
             # 1. 학습 이력 기록
-            self.db.execute_update(
+            self.db.execute_non_query(
                 """
                 INSERT INTO learning_history (word_id, study_date, is_correct, response_time, study_type)
                 VALUES (?, ?, ?, ?, 'flashcard')
                 """,
-                (word_id, current_date, is_correct, 0) # response_time은 0으로 임시 설정
+                (word_id, current_date, is_correct, 0)
             )
             
             # 2. 통계 업데이트 (total_attempts, correct_count, wrong_count)
-            self.db.execute_update(
-                """
-                INSERT INTO word_statistics (word_id, total_attempts, correct_count, wrong_count)
-                VALUES (?, 1, ?, ?)
-                ON CONFLICT(word_id) DO UPDATE SET
-                    total_attempts = total_attempts + 1,
-                    correct_count = correct_count + ?,
-                    wrong_count = wrong_count + ?
-                """,
-                (word_id, is_correct, 1 - is_correct, is_correct, 1 - is_correct)
+            # 먼저 통계 레코드가 있는지 확인
+            stats_check = self.db.execute_query(
+                "SELECT word_id FROM word_statistics WHERE word_id = ?",
+                (word_id,)
             )
+            
+            if not stats_check:
+                # 통계 레코드가 없으면 생성
+                self.db.execute_non_query(
+                    """
+                    INSERT INTO word_statistics (word_id, total_attempts, correct_count, wrong_count, ease_factor, interval_days)
+                    VALUES (?, 1, ?, ?, ?, 0)
+                    """,
+                    (word_id, is_correct, 1 - is_correct, SM2_INITIAL_EASE_FACTOR)
+                )
+            else:
+                # 통계 레코드가 있으면 업데이트
+                self.db.execute_non_query(
+                    """
+                    UPDATE word_statistics SET
+                        total_attempts = total_attempts + 1,
+                        correct_count = correct_count + ?,
+                        wrong_count = wrong_count + ?
+                    WHERE word_id = ?
+                    """,
+                    (is_correct, 1 - is_correct, word_id)
+                )
 
             # 3. SM-2 파라미터 계산 및 업데이트
-            # 현재 통계 정보를 가져옴
-            stats = self.fetch_one('word_statistics', 'word_id = ?', (word_id,))
+            stats = self.db.execute_query(
+                "SELECT ease_factor, interval_days FROM word_statistics WHERE word_id = ?",
+                (word_id,)
+            )
             
-            old_ef = stats.get('ease_factor', SM2_INITIAL_EASE_FACTOR)
-            interval = stats.get('interval_days', 0)
+            if stats and len(stats) > 0:
+                old_ef = stats[0].get('ease_factor', SM2_INITIAL_EASE_FACTOR)
+                interval = stats[0].get('interval_days', 0)
+            else:
+                old_ef = SM2_INITIAL_EASE_FACTOR
+                interval = 0
             
             new_ef, next_interval = self._calculate_sm2_params(old_ef, interval, quality)
             
             next_study_date = (datetime.datetime.now() + datetime.timedelta(days=next_interval)).strftime("%Y-%m-%d 00:00:00")
             
-            self.db.execute_update(
+            self.db.execute_non_query(
                 """
                 UPDATE word_statistics SET 
                     ease_factor = ?, 
@@ -123,6 +141,13 @@ class LearningModel(BaseModel):
     def get_learning_words(self, limit: int, learning_mode: str) -> List[Dict[str, Any]]:
         """
         학습할 단어 목록을 선정하여 반환합니다. (개인화 알고리즘 적용)
+        
+        Args:
+            limit: 최대 단어 수
+            learning_mode: 학습 모드 ('EN_TO_KR', 'KR_TO_EN', 'MIXED')
+            
+        Returns:
+            학습할 단어 목록 (딕셔너리 리스트)
         """
         # 1. 복습이 필요한 단어 (next_study_date가 현재 날짜 이전인 단어)
         review_date_condition = "T1.next_study_date IS NULL OR T1.next_study_date <= date('now')"
@@ -135,8 +160,16 @@ class LearningModel(BaseModel):
         query = f"""
             SELECT T0.*, 
                    COALESCE(T1.total_attempts, 0) AS total_attempts,
+                   COALESCE(T1.correct_count, 0) AS correct_count,
+                   COALESCE(T1.wrong_count, 0) AS wrong_count,
                    T1.next_study_date,
-                   T1.ease_factor
+                   T1.ease_factor,
+                   T1.last_study_date,
+                   CASE 
+                       WHEN T1.total_attempts > 0 THEN 
+                           ROUND((T1.wrong_count * 100.0 / T1.total_attempts), 1)
+                       ELSE NULL 
+                   END AS wrong_rate
             FROM words AS T0
             LEFT JOIN word_statistics AS T1 ON T0.word_id = T1.word_id
             WHERE {review_date_condition} OR {new_word_condition}
@@ -145,5 +178,5 @@ class LearningModel(BaseModel):
         """
         
         words = self.db.execute_query(query, (limit,))
-        _logger.info(f"학습할 단어 {len(words)}개 선정 완료. 모드: {learning_mode}")
+        _logger.info(f"학습할 단어 {len(words)}개 선정 완료. 목표: {limit}개, 모드: {learning_mode}")
         return words

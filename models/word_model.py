@@ -28,7 +28,7 @@ class WordModel(BaseModel):
         super().__init__(table_name='words') 
         logger.debug("WordModel 초기화")
     
-    def add_word(self, english: str, korean: str, memo: str = "") -> int:
+    def add_word(self, english: str, korean: str, memo: str = "", is_favorite: int = 0) -> int:
         """
         새 단어를 추가한다.
         
@@ -36,6 +36,7 @@ class WordModel(BaseModel):
             english: 영어 단어
             korean: 한국어 뜻
             memo: 메모 (선택)
+            is_favorite: 즐겨찾기 여부 (0 또는 1, 기본값 0)
         
         Returns:
             int: 추가된 단어의 ID
@@ -47,7 +48,7 @@ class WordModel(BaseModel):
         self._validate_word(english, korean)
         
         # 중복 검사
-        if self.exists('words', 'english = ?', (english,)):
+        if self.exists('english = ?', (english,)):
             logger.warning(f"중복 단어 추가 시도: {english}")
             raise ValueError(f"이미 존재하는 단어입니다: {english}")
         
@@ -56,11 +57,11 @@ class WordModel(BaseModel):
             'english': english.strip(),
             'korean': korean.strip(),
             'memo': memo.strip() if memo else '',
-            'is_favorite': 0,
+            'is_favorite': is_favorite,
             'created_date': self.get_current_datetime()
         }
         
-        word_id = self.insert('words', data)
+        word_id = self.insert(data)
         logger.info(f"단어 추가 성공: {english} (ID: {word_id})")
         
         # 통계 테이블 초기화
@@ -83,7 +84,7 @@ class WordModel(BaseModel):
             bool: 수정 성공 여부
         """
         # 단어 존재 확인
-        if not self.find_by_id('words', 'word_id', word_id):
+        if not self.find_by_id(word_id):
             logger.warning(f"존재하지 않는 단어 수정 시도: ID {word_id}")
             raise ValueError(f"단어를 찾을 수 없습니다: ID {word_id}")
         
@@ -98,7 +99,7 @@ class WordModel(BaseModel):
             data['memo'] = memo.strip()
         
         # 수정
-        updated = self.update('words', 'word_id', word_id, data)
+        updated = self.update('word_id', word_id, data)
         
         if updated > 0:
             logger.info(f"단어 수정 성공: ID {word_id}")
@@ -117,7 +118,7 @@ class WordModel(BaseModel):
         Returns:
             bool: 삭제 성공 여부
         """
-        deleted = self.delete('words', 'word_id', word_id)
+        deleted = self.delete('word_id', word_id)
         
         if deleted > 0:
             logger.info(f"단어 삭제 성공: ID {word_id}")
@@ -136,7 +137,7 @@ class WordModel(BaseModel):
         Returns:
             Optional[Dict]: 단어 정보 (없으면 None)
         """
-        word = self.find_by_id('words', 'word_id', word_id)
+        word = self.find_by_id(word_id)
         
         if word:
             # 통계 정보 추가
@@ -194,7 +195,7 @@ class WordModel(BaseModel):
         Returns:
             int: 단어 개수
         """
-        return self.count('words')
+        return self.count()
     
     def toggle_favorite(self, word_id: int) -> bool:
         """
@@ -206,12 +207,12 @@ class WordModel(BaseModel):
         Returns:
             bool: 새로운 즐겨찾기 상태
         """
-        word = self.find_by_id('words', 'word_id', word_id)
+        word = self.find_by_id(word_id)
         if not word:
             return False
         
         new_favorite = 0 if word['is_favorite'] == 1 else 1
-        self.update('words', 'word_id', word_id, {
+        self.update('word_id', word_id, {
             'is_favorite': new_favorite,
             'modified_date': self.get_current_datetime()
         })
@@ -244,7 +245,12 @@ class WordModel(BaseModel):
                 'ease_factor': 2.5,
                 'interval_days': 0
             }
-            self.insert('word_statistics', data)
+            # 다른 테이블에 삽입하므로 직접 SQL 사용
+            sql = """
+                INSERT INTO word_statistics (word_id, total_attempts, correct_count, wrong_count, ease_factor, interval_days)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """
+            self.db.execute_non_query(sql, (word_id, 0, 0, 0, 2.5, 0))
             logger.debug(f"단어 통계 초기화: ID {word_id}")
         except Exception as e:
             logger.error(f"단어 통계 초기화 실패: ID {word_id} - {e}")
@@ -252,7 +258,11 @@ class WordModel(BaseModel):
     def _enrich_word_with_stats(self, word: Dict[str, Any]) -> Dict[str, Any]:
         """단어에 통계 정보 추가"""
         word_id = word['word_id']
-        stats = self.find_by_id('word_statistics', 'word_id', word_id)
+        
+        # 다른 테이블 조회이므로 직접 SQL 사용
+        sql = "SELECT * FROM word_statistics WHERE word_id = ?"
+        result = self.db.execute_query(sql, (word_id,))
+        stats = result[0] if result else None
         
         if stats:
             if stats['total_attempts'] > 0:
