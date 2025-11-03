@@ -151,8 +151,8 @@ class BaseModel:
         values.append(id_value)  # WHERE 절의 값
         
         sql = f"UPDATE {self.table_name} SET {set_clause} WHERE {id_column} = ?"
-        
-        rowcount = self.db.execute_update(sql, tuple(values))
+
+        rowcount = self.db.execute_non_query(sql, tuple(values))
         
         logger.debug(f"레코드 수정: Table={self.table_name}, ID={id_value}, 수정 행수={rowcount}")
         return rowcount > 0
@@ -172,8 +172,8 @@ class BaseModel:
             success = model.delete('word_id', 5)
         """
         sql = f"DELETE FROM {self.table_name} WHERE {id_column} = ?"
-        
-        rowcount = self.db.execute_update(sql, (id_value,))
+
+        rowcount = self.db.execute_non_query(sql, (id_value,))
         
         logger.debug(f"레코드 삭제: Table={self.table_name}, ID={id_value}, 삭제 행수={rowcount}")
         return rowcount > 0
