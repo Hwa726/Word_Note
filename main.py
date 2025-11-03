@@ -6,30 +6,28 @@ from PyQt5.QtWidgets import QApplication, QMessageBox
 import config 
 
 # ==============================================================================
-# 인프라 및 핵심 컴포넌트 임포트
+# 💡 [수정됨] 1. 로깅과 설정 모듈을 가장 먼저 임포트합니다.
 # ==============================================================================
-# common/db_connection에서 get_db_connection을 가져옴
-from common.db_connection import get_db_connection 
-# common/logger에서 필요한 함수를 가져옴
 from common.logger import get_logger, configure_logging 
-# common/settings에서 get_settings_manager를 가져옴
 from common.settings import get_settings_manager 
 
-# Controller 임포트 (MainApp 실행에 필요)
-# 프로젝트 아키텍처에 따라 경로가 controllers/word_controller.py일 수 있습니다.
-# 현재 단계에서는 main.py와 동일한 레벨이거나, 별도의 컨트롤러 폴더가 없다고 가정합니다.
+# ==============================================================================
+# 💡 [수정됨] 2. 로깅 설정을 *먼저* 실행합니다.
+# ==============================================================================
+# 이렇게 하면, 아래에서 db_connection을 임포트할 때
+# db_connection이 get_logger를 호출해도 이미 시스템이 설정된 상태입니다.
+configure_logging()
+_logger = get_logger('main')
+
+
+# ==============================================================================
+# 💡 [수정됨] 3. 나머지 모듈을 임포트합니다.
+# ==============================================================================
+from common.db_connection import get_db_connection 
+from views.main_window import MainWindow
 from controllers.word_controller import WordController 
 from controllers.learning_controller import LearningController 
 
-# View 임포트
-from views.main_window import MainWindow
-
-# ==============================================================================
-# 로깅 및 환경 설정
-# ==============================================================================
-# 로깅 설정 (앱 실행 전)
-configure_logging()
-_logger = get_logger('main')
 
 # ==============================================================================
 # 1. 초기화 함수: 환경 설정 (디렉토리 생성)
@@ -61,7 +59,7 @@ def setup_database():
     # 1. 데이터베이스 연결 및 스키마 초기화
     db = get_db_connection() 
     try:
-        # db_connection.py에 initialize_database 메소드가 추가되어 있어야 합니다.
+        # config.py에 SCHEMA_PATH가 정의되어 있어야 함
         db.initialize_database(config.SCHEMA_PATH) 
         _logger.info(f"데이터베이스 스키마 초기화 성공: {config.DB_PATH}")
     except Exception as e:
@@ -72,12 +70,11 @@ def setup_database():
     # 2. SettingsManager에서 설정 로드
     settings = get_settings_manager()
     try:
-        # common/settings.py에 load_settings_from_db 메소드가 정의되어 있어야 합니다.
+        # common/settings.py에 load_settings_from_db 메소드가 정의되어 있어야 함
         settings.load_settings_from_db() 
         _logger.info("애플리케이션 설정 로드 완료.")
     except Exception as e:
         _logger.warning(f"데이터베이스 설정 로드 중 오류 발생. 기본 설정값 사용: {e}")
-        # 설정 로드 실패는 치명적이지 않으므로 앱은 계속 진행합니다.
     
     return True
 
@@ -96,7 +93,7 @@ def main():
         sys.exit(1)
     
     _logger.info("=======================================")
-    _logger.info(f"🚀 스마트 단어장 애플리케이션 시작 (v{config.APP_VERSION})")
+    _logger.info(f"스마트 단어장 애플리케이션 시작 (v{config.APP_VERSION})")
     _logger.info("=======================================")
 
     # 1. PyQt 애플리케이션 객체 생성

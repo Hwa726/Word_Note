@@ -540,3 +540,56 @@ Params: (1, 0, 0, 0, 2.5, 0)
 2025-10-27 11:36:28 - learning_settings_tab - DEBUG - 목표 단어 수 변경: 3개
 2025-10-27 11:36:28 - learning_settings_tab - DEBUG - 목표 단어 수 변경: 2개
 2025-10-27 11:36:29 - learning_settings_tab - DEBUG - 목표 단어 수 변경: 1개
+2025-10-27 14:00:23 - root - INFO - 로깅 시스템 초기화 완료.
+2025-10-27 14:00:23 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-10-27 14:00:23 - main - INFO - =======================================
+2025-10-27 14:00:23 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-10-27 14:00:23 - main - INFO - =======================================
+2025-10-27 14:00:23 - main - INFO - 데이터베이스 설정 시작...
+2025-10-27 14:00:23 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-10-27 14:00:23 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-10-27 14:00:23 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-10-27 14:00:23 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-10-27 14:00:23 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-10-27 14:00:23 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-10-27 14:00:23 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-27 14:00:23 - models.word_model - DEBUG - WordModel 초기화
+2025-10-27 14:00:23 - controllers.word_controller - DEBUG - WordController 초기화
+2025-10-27 14:00:23 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-27 14:00:23 - main_window - DEBUG - MainWindow 초기화 시작
+2025-10-27 14:00:23 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-10-27 14:00:23 - models.word_model - DEBUG - WordModel 초기화
+2025-10-27 14:00:23 - controllers.word_controller - DEBUG - WordController 초기화
+2025-10-27 14:00:23 - views.word_manager_view - DEBUG - 단어 목록 새로고침 시작
+2025-10-27 14:00:23 - views.word_manager_view - INFO - 단어 목록 표시 완료: 5개
+2025-10-27 14:00:23 - views.word_manager_view - INFO - WordManagerView 초기화 완료
+2025-10-27 14:00:23 - learning_settings_tab - DEBUG - LearningSettingsTab 초기화 완료
+2025-10-27 14:00:23 - main_window - INFO - MainWindow UI 설정 완료
+2025-10-27 14:00:23 - main - INFO - 메인 윈도우 표시 완료. 이벤트 루프 진입.
+2025-10-27 14:00:34 - learning_settings_tab - DEBUG - 목표 단어 수 변경: 2개
+2025-11-03 11:39:57 - root - INFO - 로깅 시스템 초기화 완료.
+2025-11-03 11:39:57 - main - INFO - 환경 설정 완료: 필수 디렉토리 확인
+2025-11-03 11:39:57 - main - INFO - =======================================
+2025-11-03 11:39:57 - main - INFO - 🚀 스마트 단어장 애플리케이션 시작 (v1.0.0)
+2025-11-03 11:39:57 - main - INFO - =======================================
+2025-11-03 11:39:57 - main - INFO - 데이터베이스 설정 시작...
+2025-11-03 11:39:57 - common.db_connection - INFO - DB 연결 성공: C:\dev\word\data\vocabulary.db
+2025-11-03 11:39:57 - common.db_connection - INFO - 데이터베이스 스키마 초기화 완료: schema.sql
+2025-11-03 11:39:57 - main - INFO - 데이터베이스 스키마 초기화 성공: C:\dev\word\data\vocabulary.db
+2025-11-03 11:39:57 - common.settings - DEBUG - SettingsManager 인스턴스 생성
+2025-11-03 11:39:57 - common.settings - INFO - DB에서 설정 로드 성공 및 적용 완료.
+2025-11-03 11:39:57 - main - INFO - 애플리케이션 설정 로드 완료.
+2025-11-03 11:39:57 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-11-03 11:39:57 - models.word_model - DEBUG - WordModel 초기화
+2025-11-03 11:39:57 - controllers.word_controller - DEBUG - WordController 초기화
+2025-11-03 11:39:57 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-11-03 11:39:57 - main_window - DEBUG - MainWindow 초기화 시작
+2025-11-03 11:39:58 - common.base_model - DEBUG - BaseModel 초기화 완료: Table=words
+2025-11-03 11:39:58 - models.word_model - DEBUG - WordModel 초기화
+2025-11-03 11:39:58 - controllers.word_controller - DEBUG - WordController 초기화
+2025-11-03 11:39:58 - views.word_manager_view - DEBUG - 단어 목록 새로고침 시작
+2025-11-03 11:39:58 - views.word_manager_view - INFO - 단어 목록 표시 완료: 5개
+2025-11-03 11:39:58 - views.word_manager_view - INFO - WordManagerView 초기화 완료
+2025-11-03 11:39:58 - learning_settings_tab - DEBUG - LearningSettingsTab 초기화 완료
+2025-11-03 11:39:58 - main_window - INFO - MainWindow UI 설정 완료
+2025-11-03 11:39:58 - main - INFO - 메인 윈도우 표시 완료. 이벤트 루프 진입.

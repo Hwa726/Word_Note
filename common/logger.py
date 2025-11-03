@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # config.py에서 로깅 관련 설정을 가져옴 
-import config
+import config 
 
 class Logger:
     """
@@ -39,7 +39,7 @@ class Logger:
         
         # 3. 파일 핸들러 (RotatingFileHandler)
         try:
-            # 파일 로깅 경로 확인 및 생성
+            # 파일 로깅 경로 확인 (config.py에서 LOG_FILE 경로 사용)
             log_path = Path(config.LOG_FILE)
             
             # RotatingFileHandler: 5MB(1024*1024*5 bytes)마다 최대 5개 파일로 순환
@@ -77,8 +77,9 @@ class Logger:
         Returns:
             logging.Logger: 로거 객체
         """
-        if not Logger._configured:
-            Logger.configure_logging()
+        # 💡 [수정됨] 자동 설정 로직 제거
+        # if not Logger._configured:
+        #     Logger.configure_logging() # 이 부분이 순환 참조를 일으킴
         return logging.getLogger(name)
 
 # ==============================================================================
@@ -97,6 +98,7 @@ def get_logger(name: str):
     지정된 이름의 로거 인스턴스를 반환합니다.
     다른 모듈에서 from common.logger import get_logger 형태로 사용
     """
+    # 💡 [수정됨] 자동 설정 로직 제거
     return Logger.get_logger(name)
 
 # ==============================================================================

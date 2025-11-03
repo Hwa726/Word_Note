@@ -16,3 +16,8 @@ venv/
 # System
 .DS_Store
 Thumbs.db
+
+# Claude Code
+.claude/
+CLAUDE.md
+nul
